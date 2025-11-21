@@ -13,6 +13,10 @@ import 'package:cake_wallet/buy/moonpay/moonpay_provider.dart';
 import 'package:cake_wallet/buy/onramper/onramper_buy_provider.dart';
 import 'package:cake_wallet/new-ui/new_dashboard.dart';
 import 'package:cake_wallet/new-ui/pages/home_page.dart';
+import 'package:cake_wallet/new-ui/pages/receive_page.dart';
+import 'package:cake_wallet/new-ui/pages/scan_page.dart';
+import 'package:cake_wallet/new-ui/pages/send_page.dart';
+import 'package:cake_wallet/new-ui/pages/swap_page.dart';
 import 'package:cake_wallet/order/order.dart';
 import 'package:cake_wallet/core/backup_service_v3.dart';
 import 'package:cake_wallet/core/new_wallet_arguments.dart';
@@ -821,6 +825,11 @@ Future<void> setup({
       addressListViewModel: getIt.get<WalletAddressListViewModel>(),
       dashboardViewModel: getIt.get<DashboardViewModel>(),
       receiveOptionViewModel: getIt.get<ReceiveOptionViewModel>()));
+
+  getIt.registerFactory<NewSendPage>(()=>NewSendPage());
+  getIt.registerFactory<NewReceivePage>(()=>NewReceivePage(addressListViewModel: getIt.get<WalletAddressListViewModel>(),));
+  getIt.registerFactory<NewSwapPage>(()=>NewSwapPage());
+  getIt.registerFactory<NewScanPage>(()=>NewScanPage());
 
   getIt.registerFactoryParam<WalletAddressEditOrCreateViewModel, WalletAddressListItem?, void>(
       (WalletAddressListItem? item, _) =>

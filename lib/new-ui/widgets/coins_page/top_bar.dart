@@ -7,7 +7,8 @@ class TopBar extends StatelessWidget {
   const TopBar({
     super.key,
     required this.lightningMode,
-    required this.onLightningSwitchPress, required this.dashboardViewModel,
+    required this.onLightningSwitchPress,
+    required this.dashboardViewModel,
   });
 
   final bool lightningMode;
@@ -22,55 +23,81 @@ class TopBar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           (dashboardViewModel.balanceViewModel.hasSecondAdditionalBalance ||
-          dashboardViewModel.balanceViewModel.hasSecondAvailableBalance) ?
-          SizedBox(
-            child: AnimatedSwitcher(
-              duration: Duration(milliseconds: 200),
-              transitionBuilder: (child, animation) =>
-                  FadeTransition(opacity: animation, child: child),
-              child: ElevatedButton(
-                key: ValueKey(lightningMode),
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.all(4),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(900.0)),
+                  dashboardViewModel.balanceViewModel.hasSecondAvailableBalance)
+              ? SizedBox(
+                  child: AnimatedSwitcher(
+                    duration: Duration(milliseconds: 200),
+                    transitionBuilder: (child, animation) =>
+                        FadeTransition(opacity: animation, child: child),
+                    child: ElevatedButton(
+                      key: ValueKey(lightningMode),
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.all(4),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(900.0)),
+                        ),
+                        backgroundColor: Theme.of(
+                          context,
+                        ).colorScheme.surfaceContainer,
+                      ),
+                      onPressed: onLightningSwitchPress,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          SvgPicture.asset(
+                            lightningMode
+                                ? 'assets/new-ui/switcher-lightning.svg'
+                                : 'assets/new-ui/switcher-bitcoin.svg',
+                            width: 40,
+                            height: 40,
+                            colorFilter: ColorFilter.mode(
+                              Theme.of(context).colorScheme.primary,
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                          SvgPicture.asset(
+                            lightningMode
+                                ? 'assets/new-ui/switcher-bitcoin-off.svg'
+                                : 'assets/new-ui/switcher-lightning-off.svg',
+                            width: 40,
+                            height: 40,
+                            colorFilter: ColorFilter.mode(
+                              Theme.of(context).colorScheme.primary,
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                  backgroundColor: Theme.of(
-                    context,
-                  ).colorScheme.surfaceContainer,
-                ),
-                onPressed: onLightningSwitchPress,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    SvgPicture.asset(
-                      lightningMode
-                          ? 'assets/new-ui/switcher-lightning.svg'
-                          : 'assets/new-ui/switcher-bitcoin.svg',
-                      width: 40,
-                      height: 40,
-                      colorFilter: ColorFilter.mode(
-                        Theme.of(context).colorScheme.primary,
-                        BlendMode.srcIn,
+                )
+              : GestureDetector(
+                onTap:(){dashboardViewModel.refreshDashboard();},
+                child: Stack(
+                    children: [
+                      if(dashboardViewModel.status.progress() < 1)
+                      CircularProgressIndicator(
+                          value: dashboardViewModel.status.progress(),
+                          color: Theme.of(context).colorScheme.onSurface),
+                      AnimatedSize(
+                        duration: Duration(milliseconds: 100),
+                        child: SvgPicture.asset(
+                            width: dashboardViewModel.status.progress() < 1 ? 32 : 36,
+                            height: dashboardViewModel.status.progress() < 1 ? 32 : 36,
+                            colorFilter: ColorFilter.mode(
+                              Theme.of(context).colorScheme.primary,
+                              BlendMode.srcIn,
+                            ),
+                            "assets/new-ui/crypto-minimal-icons/${dashboardViewModel.balanceViewModel.asset}.svg"),
                       ),
-                    ),
-                    SvgPicture.asset(
-                      lightningMode
-                          ? 'assets/new-ui/switcher-bitcoin-off.svg'
-                          : 'assets/new-ui/switcher-lightning-off.svg',
-                      width: 40,
-                      height: 40,
-                      colorFilter: ColorFilter.mode(
-                        Theme.of(context).colorScheme.primary,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
               ),
-            ),
-          ) : Container(),
-          ModernButton.svg(size: 44, onPressed: (){}, svgPath: "assets/new-ui/top-settings.svg",),
+          ModernButton.svg(
+            size: 44,
+            onPressed: () {},
+            svgPath: "assets/new-ui/top-settings.svg",
+          ),
         ],
       ),
     );
