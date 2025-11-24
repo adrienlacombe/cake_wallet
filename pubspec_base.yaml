@@ -245,6 +245,7 @@ flutter:
     - assets/animation/
     - assets/new-ui/
     - assets/new-ui/crypto-minimal-icons/
+    - assets/new-ui/address-type-picker-icons/
 
   fonts:
     - family: Lato
