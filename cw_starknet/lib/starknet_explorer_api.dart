@@ -1,17 +1,18 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:cw_core/utils/proxy_wrapper.dart';
 import 'package:cw_starknet/starknet_exceptions.dart';
 
 class StarknetExplorerApi {
   // Using Voyager Beta API
   static const String _baseUrl = 'https://api.voyager.online/beta';
+  final ProxyWrapper _proxyWrapper = ProxyWrapper();
 
   Future<List<Map<String, dynamic>>> getTransactions(String address, {int page = 1, int pageSize = 20}) async {
     final url = Uri.parse('$_baseUrl/txns?to=$address&ps=$pageSize&p=$page');
-    
+
     try {
-      final response = await http.get(url);
-      
+      final response = await _proxyWrapper.get(clearnetUri: url);
+
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         // Voyager API returns { "items": [...], "lastPage": ... }
@@ -34,10 +35,10 @@ class StarknetExplorerApi {
 
   Future<List<Map<String, dynamic>>> getTransfers(String address, {int page = 1, int pageSize = 20}) async {
     final url = Uri.parse('$_baseUrl/transfers?to=$address&ps=$pageSize&p=$page');
-    
+
     try {
-      final response = await http.get(url);
-      
+      final response = await _proxyWrapper.get(clearnetUri: url);
+
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data is Map<String, dynamic> && data.containsKey('items')) {
