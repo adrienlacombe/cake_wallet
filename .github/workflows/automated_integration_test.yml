@@ -12,7 +12,7 @@ defaults:
     shell: bash
 jobs:
   Automated_integration_test:
-    runs-on: linux-amd64
+    runs-on: ubuntu-latest
     timeout-minutes: 90
     container:
       image: ghcr.io/cake-tech/cake_wallet:debian12-flutter3.27.0-go1.24.1-ruststablenightly
@@ -22,16 +22,6 @@ jobs:
         MONEROC_CACHE_DIR_ROOT: /opt/generic_cache
         BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         ANDROID_AVD_HOME: /root/.android/avd
-      volumes:
-        - /opt/cw_cache_android/root/.cache:/root/.cache
-        - /opt/cw_cache_android/root/.android/avd/:/root/.android/avd
-        - /opt/cw_cache_android/root/.ccache:/root/.ccache
-        - /opt/cw_cache_android/root/.pub-cache/:/root/.pub-cache
-        - /opt/cw_cache_android/root/.gradle/:/root/.gradle
-        - /opt/cw_cache_android/root/.android/:/root/.android
-        - /opt/cw_cache_android/root/go/pkg:/root/go/pkg
-        - /opt/cw_cache_android/opt/generic_cache:/opt/generic_cache
-        - /dev/kvm:/dev/kvm
     strategy:
       matrix:
         api-level: [29]
