@@ -49,7 +49,7 @@ class SeedValidator extends Validator<MnemonicItem> {
       case WalletType.tron:
         return tron!.getTronWordList(language);
       case WalletType.wownero:
-          return wownero!.getWowneroWordList(language);
+        return wownero!.getWowneroWordList(language);
       case WalletType.zano:
         return zano!.getWordList(language);
       case WalletType.decred:
@@ -60,6 +60,7 @@ class SeedValidator extends Validator<MnemonicItem> {
         return arbitrum!.getArbitrumWordList(language);
       case WalletType.none:
       case WalletType.haven:
+      case WalletType.starknet:
         return [];
     }
   }

@@ -6,7 +6,7 @@ import 'package:cw_core/amount_converter.dart';
 ///
 /// Supports both regular invoke transactions and account deployment transactions.
 /// For auto-deployment, tracks both the deployment and invoke transaction.
-class StarknetPendingTransaction extends PendingTransaction {
+class StarknetPendingTransaction with PendingTransaction {
   StarknetPendingTransaction({
     required this.amount,
     required this.fee,
@@ -54,6 +54,18 @@ class StarknetPendingTransaction extends PendingTransaction {
         fee.toInt(),
       );
 
+  @override
+  String get feeFormattedValue => AmountConverter.amountIntToString(
+        CryptoCurrency.strk,
+        fee.toInt(),
+      );
+
+  @override
+  String? get feeRate => null;
+
+  @override
+  String get hex => '';
+
   /// Get deployment status message
   String get deploymentStatus {
     if (deploymentTxHash != null) {
@@ -75,6 +87,11 @@ class StarknetPendingTransaction extends PendingTransaction {
   }
 
   @override
+  Future<Map<String, String>> commitUR() async {
+    return {};
+  }
+
+  @override
   String toString() {
     final buffer = StringBuffer();
     buffer.writeln('StarknetPendingTransaction(');
@@ -89,4 +106,3 @@ class StarknetPendingTransaction extends PendingTransaction {
     return buffer.toString();
   }
 }
-

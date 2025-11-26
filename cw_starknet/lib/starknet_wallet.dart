@@ -47,7 +47,7 @@ abstract class StarknetWalletBase
   })  : syncStatus = const NotConnectedSyncStatus(),
         _password = password,
         _mnemonic = mnemonic,
-        _privateKey = privateKey,
+        _privateKeyHex = privateKey, // Store hex string only for initialization
         _client = client ?? StarknetClient("https://starknet-mainnet.public.blastapi.io"), // Default node
         walletAddresses = StarknetWalletAddresses(walletInfo, accountAddress: accountAddress),
         balance = ObservableMap<CryptoCurrency, StarknetBalance>.of(
@@ -64,10 +64,11 @@ abstract class StarknetWalletBase
   final String _password;
   final EncryptionFileUtils encryptionFileUtils;
   final String? _mnemonic;
-  final String? _privateKey;
+  final String? _privateKeyHex; // Stored only for loading from .keys file, not used after init
 
   late final StarknetClient _client;
   Signer? _signer;
+  Felt? _privateKeyFelt; // Derived private key stored as Felt (more secure than String)
 
   @override
   WalletAddresses walletAddresses;
@@ -81,18 +82,28 @@ abstract class StarknetWalletBase
   late ObservableMap<CryptoCurrency, StarknetBalance> balance;
 
   @override
-  Object get keys => _privateKey ?? '';
+  Object get keys => privateKey;
 
   @override
   String? get seed => _mnemonic;
 
   @override
-  String get privateKey => _privateKey ?? '';
+  String get privateKey {
+    // Derive from signer if available, otherwise from stored felt or hex
+    if (_signer != null) {
+      return _signer!.privateKey.toHexString();
+    }
+    if (_privateKeyFelt != null) {
+      return _privateKeyFelt!.toHexString();
+    }
+    // Fallback to hex string (only during initialization)
+    return _privateKeyHex ?? '';
+  }
 
   Future<void> init() async {
     try {
       // Validate that we have either mnemonic or private key
-      if (_mnemonic == null && _privateKey == null) {
+      if (_mnemonic == null && _privateKeyHex == null) {
         throw StarknetWalletInitializationException(
           'Cannot initialize wallet: no mnemonic or private key provided',
           details: 'Wallet must be created with either a mnemonic phrase or private key.',
@@ -102,16 +113,16 @@ abstract class StarknetWalletBase
       // Initialize the signer from mnemonic or private key
       if (_mnemonic != null) {
         _initializeFromMnemonic(_mnemonic!);
-      } else if (_privateKey != null) {
-        _initializeFromPrivateKey(_privateKey!);
+      } else if (_privateKeyHex != null) {
+        _initializeFromPrivateKey(_privateKeyHex!);
       }
 
       // Calculate and set account address if not already set
       if (walletInfo.address == '0x0' || walletInfo.address.isEmpty) {
-        if (_signer != null) {
+        if (_signer != null && _privateKeyFelt != null) {
           final publicKey = _signer!.publicKey;
           final account = StarknetAccount(
-            privateKey: Felt.fromHexString(_privateKey!),
+            privateKey: _privateKeyFelt!,
             publicKey: publicKey,
             provider: _client.provider,
             isMainnet: !walletInfo.network.toLowerCase().contains('test'),
@@ -124,6 +135,10 @@ abstract class StarknetWalletBase
 
       await walletAddresses.init();
       await transactionHistory.init();
+      
+      // Save keys to .keys file (separate from wallet data)
+      await saveKeysFile(_password, encryptionFileUtils);
+      
       await save();
     } catch (e) {
       if (e is StarknetException) rethrow;
@@ -137,11 +152,10 @@ abstract class StarknetWalletBase
   void _initializeFromMnemonic(String mnemonic) {
     try {
       // Derive private key from mnemonic using Starknet BIP44 path with grinding
-      final privateKeyFelt = StarknetKeyDerivation.derivePrivateKeyFromMnemonic(mnemonic);
-      _privateKey = privateKeyFelt.toHexString();
+      _privateKeyFelt = StarknetKeyDerivation.derivePrivateKeyFromMnemonic(mnemonic);
 
       // Create signer
-      _signer = Signer(privateKey: privateKeyFelt);
+      _signer = Signer(privateKey: _privateKeyFelt!);
     } catch (e) {
       throw StarknetKeyDerivationException(
         'Failed to initialize wallet from mnemonic',
@@ -161,8 +175,8 @@ abstract class StarknetWalletBase
       }
 
       // Initialize signer from private key
-      final privateKeyFelt = Felt.fromHexString(privateKey);
-      _signer = Signer(privateKey: privateKeyFelt);
+      _privateKeyFelt = Felt.fromHexString(privateKey);
+      _signer = Signer(privateKey: _privateKeyFelt!);
     } catch (e) {
       if (e is StarknetKeyDerivationException) rethrow;
       throw StarknetKeyDerivationException(
@@ -217,17 +231,10 @@ abstract class StarknetWalletBase
     try {
       final transactionCredentials = credentials as StarknetTransactionCredentials;
 
-      if (_signer == null) {
+      if (_signer == null || _privateKeyFelt == null) {
         throw StarknetWalletInitializationException(
           'Wallet not initialized',
           details: 'Signer not available. Please ensure wallet is properly initialized.',
-        );
-      }
-
-      if (_privateKey == null) {
-        throw StarknetWalletInitializationException(
-          'Private key not available',
-          details: 'Cannot create transaction without private key.',
         );
       }
 
@@ -240,7 +247,9 @@ abstract class StarknetWalletBase
 
       final output = transactionCredentials.outputs.first;
       final recipientAddress = output.address;
-      final amount = BigInt.parse(output.formattedCryptoAmount ?? '0');
+      final amount = output.formattedCryptoAmount != null
+          ? BigInt.from(output.formattedCryptoAmount!)
+          : BigInt.zero;
       final currency = transactionCredentials.currency;
 
       // Determine contract address
@@ -269,7 +278,7 @@ abstract class StarknetWalletBase
 
     // Step 1: Create account instance
     final starknetAccount = StarknetAccount(
-      privateKey: Felt.fromHexString(_privateKey!),
+      privateKey: _privateKeyFelt!,
       publicKey: _signer!.publicKey,
       provider: _client.provider,
       isMainnet: !walletInfo.network.toLowerCase().contains('test'),
@@ -577,7 +586,7 @@ abstract class StarknetWalletBase
   @override
   WalletKeysData get walletKeysData => WalletKeysData(
         mnemonic: _mnemonic,
-        privateKey: _privateKey,
+        privateKey: privateKey, // Derive from signer/felt, not from stored hex
       );
 
   String toJSON() => json.encode({
@@ -635,6 +644,13 @@ abstract class StarknetWalletBase
           ),
           encryptionFileUtils,
         );
+        // Clear keys from wallet data file after migration
+        if (data != null && (data.containsKey('mnemonic') || data.containsKey('privateKey'))) {
+          data.remove('mnemonic');
+          data.remove('privateKey');
+          final updatedJson = json.encode(data);
+          await encryptionFileUtils.write(path: path, password: password, data: updatedJson);
+        }
       } catch (e) {
         printV('Error creating .keys file during migration: $e');
       }

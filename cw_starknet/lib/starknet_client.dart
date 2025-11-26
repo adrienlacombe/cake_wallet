@@ -64,7 +64,7 @@ class StarknetClient {
           entryPointSelector: getSelectorByName(StarknetConstants.BALANCE_OF_SELECTOR),
           calldata: [accountAddress],
         ),
-        blockId: BlockId.latest,
+        blockId: BlockId.blockTag("latest"),
       );
 
       return result.when(
@@ -93,7 +93,7 @@ class StarknetClient {
 
       final result = await provider.getClassHashAt(
         contractAddress: accountAddress,
-        blockId: BlockId.latest,
+        blockId: BlockId.blockTag("latest"),
       );
 
       return result.when(
@@ -115,7 +115,7 @@ class StarknetClient {
 
       final result = await provider.getNonce(
         contractAddress: accountAddress,
-        blockId: BlockId.latest,
+        blockId: BlockId.blockTag("latest"),
       );
 
       return result.when(
@@ -213,40 +213,17 @@ class StarknetClient {
 
   /// Estimate fee for an invoke transaction
   ///
-  /// Note: This is a simplified version. Full implementation would use
-  /// the account's estimateFee method after creating an Account instance.
-  Future<BigInt> estimateFee(
-    String accountAddress,
-    List<Call> calls,
-  ) async {
-    try {
-      // Convert calls to InvokeFunctionCall format
-      final invokeCalls = calls.map((call) => InvokeFunctionCall(
-        contractAddress: call.to,
-        entryPointSelector: call.selector,
-        calldata: call.calldata,
-      )).toList();
-
-      final result = await provider.estimateFee(
-        request: invokeCalls,
-        blockId: BlockId.latest,
-      );
-
-      return result.when(
-        result: (estimates) {
-          if (estimates.isEmpty) return BigInt.zero;
-          return estimates.first.overallFee.toBigInt();
-        },
-        error: (error) {
-          printV('Fee estimation error: ${error.message}');
-          return BigInt.zero;
-        },
-      );
-    } catch (e) {
-      printV('Exception in estimateFee: $e');
-      return BigInt.zero;
-    }
-  }
+  /// Note: This method is not currently used. Fee estimation is done
+  /// directly through the Account instance in starknet_wallet.dart
+  /// This is kept for potential future use.
+  // TODO: Implement when needed using the correct starknet package API
+  // Future<BigInt> estimateFee(
+  //   String accountAddress,
+  //   List<Call> calls,
+  // ) async {
+  //   // Implementation would go here
+  //   return BigInt.zero;
+  // }
 
   /// Get transactions for an address
   ///

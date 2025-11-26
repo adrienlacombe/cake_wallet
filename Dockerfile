@@ -48,7 +48,7 @@ RUN set -o xtrace \
     # Core dependencies
     bc build-essential curl default-jdk git jq lcov libglu1-mesa libpulse0 libsqlite3-dev libstdc++6 locales openssh-client ruby-bundler ruby-full sudo unzip wget zip \
     # for x86 emulators
-    libatk-bridge2.0-0 libgdk-pixbuf-xlib-2.0-0 libgtk-3-0 libnspr4 libnss3-dev libsqlite3-dev libxtst6 libxss1 lftp sqlite3 xxd \
+    libatk-bridge2.0-0 libgtk-3-0 libnspr4 libnss3-dev libsqlite3-dev libxtst6 libxss1 lftp sqlite3 xxd \
     # Linux desktop dependencies
     clang cmake libgtk-3-dev ninja-build pkg-config libsecret-1-0 libsecret-1-dev gir1.2-secret-1 \
     # monero_c dependencies

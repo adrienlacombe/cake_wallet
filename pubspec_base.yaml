@@ -155,6 +155,7 @@ dependencies:
   starknet:
     git:
       url: https://github.com/focustree/starknet.dart.git
+      path: packages/starknet
   cw_starknet:
     path: cw_starknet
 
@@ -165,10 +166,10 @@ dev_dependencies:
   integration_test:
     sdk: flutter
   mocktail: ^1.0.4
-  build_runner: ^2.4.15
+  build_runner: ^2.4.13
   logging: ^1.2.0
   mobx_codegen: ^2.1.1
-  build_resolvers: ^2.4.4
+  build_resolvers: 2.4.2
   hive_generator: ^2.0.1
   # flutter_launcher_icons: ^0.11.0
   # check flutter_launcher_icons for usage
@@ -209,6 +210,15 @@ dependency_overrides:
   web_socket_channel: ^3.0.2
   freezed_annotation: 2.4.4
   intl: 0.20.2
+  starknet_provider:
+    git:
+      url: https://github.com/focustree/starknet.dart.git
+      path: packages/starknet_provider
+  starknet:
+    git:
+      url: https://github.com/focustree/starknet.dart.git
+      path: packages/starknet
+  mockito: 5.4.4
 
 flutter_icons:
   image_path: "assets/images/app_logo.png"

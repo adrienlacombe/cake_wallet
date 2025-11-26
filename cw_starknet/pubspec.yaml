@@ -9,7 +9,10 @@ environment:
 dependencies:
   cw_core:
     path: ../cw_core
-  starknet: ^0.2.0
+  starknet:
+    git:
+      url: https://github.com/focustree/starknet.dart.git
+      path: packages/starknet
   flutter:
     sdk: flutter
   hive: ^2.2.3
