@@ -1,8 +1,8 @@
 import 'package:starknet/starknet.dart';
 import 'package:cw_starknet/starknet_constants.dart';
 import 'package:cw_starknet/starknet_exceptions.dart';
-
 import 'package:cw_starknet/starknet_explorer_api.dart';
+import 'package:cw_core/utils/print_verbose.dart';
 
 /// Client for interacting with Starknet blockchain via JSON-RPC
 ///
@@ -74,12 +74,12 @@ class StarknetClient {
           return result[0].toBigInt();
         },
         error: (error) {
-          print('Error fetching balance: ${error.message}');
+          printV('Error fetching balance: ${error.message}');
           return BigInt.zero;
         },
       );
     } catch (e) {
-      print('Exception in getBalance: $e');
+      printV('Exception in getBalance: $e');
       return BigInt.zero;
     }
   }
@@ -101,7 +101,7 @@ class StarknetClient {
         error: (_) => false,
       );
     } catch (e) {
-      print('Error checking account deployment: $e');
+      printV('Error checking account deployment: $e');
       return false;
     }
   }
@@ -123,7 +123,7 @@ class StarknetClient {
         error: (_) => BigInt.zero,
       );
     } catch (e) {
-      print('Error getting nonce: $e');
+      printV('Error getting nonce: $e');
       return BigInt.zero;
     }
   }
@@ -147,12 +147,12 @@ class StarknetClient {
           'transaction_hash': receipt.transactionHash.toHexString(),
         },
         error: (error) {
-          print('Error getting transaction receipt: ${error.message}');
+          printV('Error getting transaction receipt: ${error.message}');
           return null;
         },
       );
     } catch (e) {
-      print('Exception in getTransactionReceipt: $e');
+      printV('Exception in getTransactionReceipt: $e');
       return null;
     }
   }
@@ -192,7 +192,7 @@ class StarknetClient {
     while (true) {
       final elapsed = DateTime.now().difference(startTime).inSeconds;
       if (elapsed > maxWaitSeconds) {
-        print('Transaction wait timeout after $maxWaitSeconds seconds');
+        printV('Transaction wait timeout after $maxWaitSeconds seconds');
         return false;
       }
 
@@ -202,7 +202,7 @@ class StarknetClient {
         if (status.contains('ACCEPTED_ON_L2') || status.contains('ACCEPTED_ON_L1')) {
           return true;
         } else if (status.contains('REJECTED')) {
-          print('Transaction was rejected: $txHash');
+          printV('Transaction was rejected: $txHash');
           return false;
         }
       }
@@ -238,12 +238,12 @@ class StarknetClient {
           return estimates.first.overallFee.toBigInt();
         },
         error: (error) {
-          print('Fee estimation error: ${error.message}');
+          printV('Fee estimation error: ${error.message}');
           return BigInt.zero;
         },
       );
     } catch (e) {
-      print('Exception in estimateFee: $e');
+      printV('Exception in estimateFee: $e');
       return BigInt.zero;
     }
   }
@@ -275,7 +275,7 @@ class StarknetClient {
         error: (error) => throw Exception('Failed to get chain ID: ${error.message}'),
       );
     } catch (e) {
-      print('Exception in getChainId: $e');
+      printV('Exception in getChainId: $e');
       rethrow;
     }
   }
@@ -286,7 +286,7 @@ class StarknetClient {
       await getBlockHeight();
       return true;
     } catch (e) {
-      print('Node health check failed: $e');
+      printV('Node health check failed: $e');
       return false;
     }
   }

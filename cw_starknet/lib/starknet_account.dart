@@ -1,5 +1,6 @@
 import 'package:starknet/starknet.dart';
 import 'package:cw_starknet/starknet_constants.dart';
+import 'package:cw_core/utils/print_verbose.dart';
 
 /// Encapsulates Argent account abstraction logic for Starknet
 ///
@@ -115,7 +116,7 @@ class StarknetAccount {
       return _isDeployed!;
     } catch (e) {
       // On any exception, assume not deployed
-      print('Error checking deployment status: $e');
+      printV('Error checking deployment status: $e');
       _isDeployed = false;
       return false;
     }

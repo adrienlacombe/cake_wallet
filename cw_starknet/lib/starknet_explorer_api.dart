@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:cw_core/utils/proxy_wrapper.dart';
 import 'package:cw_starknet/starknet_exceptions.dart';
+import 'package:cw_core/utils/print_verbose.dart';
 
 class StarknetExplorerApi {
   // Using Voyager Beta API
@@ -22,12 +23,12 @@ class StarknetExplorerApi {
           return [];
         }
       } else {
-        print('Explorer API error: ${response.statusCode} - ${response.body}');
+        printV('Explorer API error: ${response.statusCode} - ${response.body}');
         // Return empty list instead of throwing to avoid blocking the UI
         return [];
       }
     } catch (e) {
-      print('Explorer API connection error: $e');
+      printV('Explorer API connection error: $e');
       // Return empty list on connection error
       return [];
     }
@@ -47,11 +48,11 @@ class StarknetExplorerApi {
           return [];
         }
       } else {
-        print('Explorer API error (transfers): ${response.statusCode} - ${response.body}');
+        printV('Explorer API error (transfers): ${response.statusCode} - ${response.body}');
         return [];
       }
     } catch (e) {
-      print('Explorer API connection error (transfers): $e');
+      printV('Explorer API connection error (transfers): $e');
       return [];
     }
   }

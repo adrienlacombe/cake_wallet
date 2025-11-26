@@ -26,6 +26,7 @@ import 'package:cw_starknet/starknet_tokens.dart';
 import 'package:cw_starknet/starknet_exceptions.dart';
 import 'package:mobx/mobx.dart';
 import 'package:starknet/starknet.dart';
+import 'package:cw_core/utils/print_verbose.dart';
 
 part 'starknet_wallet.g.dart';
 
@@ -281,15 +282,15 @@ abstract class StarknetWalletBase
     BigInt deployFee = BigInt.zero;
 
     if (!isDeployed) {
-      print('Account not deployed. Auto-deploying...');
+      printV('Account not deployed. Auto-deploying...');
 
       // Step 3: Deploy account
       final deployResult = await _deployAccount(starknetAccount);
       deployTxHash = deployResult['txHash'] as String;
       deployFee = deployResult['fee'] as BigInt;
 
-      print('Deployment transaction sent: $deployTxHash');
-      print('Waiting for deployment confirmation...');
+      printV('Deployment transaction sent: $deployTxHash');
+      printV('Waiting for deployment confirmation...');
 
       // Step 4: Wait for deployment confirmation
       final deploySuccess = await _client.waitForTransaction(
@@ -306,7 +307,7 @@ abstract class StarknetWalletBase
         );
       }
 
-      print('Account successfully deployed!');
+      printV('Account successfully deployed!');
 
       // Reset deployment status cache
       starknetAccount.resetDeploymentStatus();
@@ -341,8 +342,8 @@ abstract class StarknetWalletBase
     final maxFee = (invokeFee * BigInt.from(StarknetConstants.FEE_BUFFER_PERCENTAGE)) ~/
         BigInt.from(StarknetConstants.FEE_BUFFER_DIVISOR);
 
-    print('Estimated invoke fee: $invokeFee wei');
-    print('Max fee with buffer: $maxFee wei');
+    printV('Estimated invoke fee: $invokeFee wei');
+    printV('Max fee with buffer: $maxFee wei');
 
     // Check sufficient balance for transaction
     final currentBalance = balance[currency]?.available ?? BigInt.zero;
@@ -382,7 +383,7 @@ abstract class StarknetWalletBase
       ),
     );
 
-    print('Invoke transaction sent: $txHash');
+    printV('Invoke transaction sent: $txHash');
 
     // Return pending transaction with deployment info
     return StarknetPendingTransaction(
@@ -421,15 +422,15 @@ abstract class StarknetWalletBase
       }
 
       // Estimate deployment fee
-      print('Estimating deployment fee...');
+      printV('Estimating deployment fee...');
       final estimatedFee = await starknetAccount.estimateDeploymentFee();
 
       // Add 20% buffer for fee fluctuation
       final maxFee = (estimatedFee * BigInt.from(StarknetConstants.FEE_BUFFER_PERCENTAGE)) ~/
           BigInt.from(StarknetConstants.FEE_BUFFER_DIVISOR);
 
-      print('Estimated deployment fee: $estimatedFee wei');
-      print('Max fee with buffer: $maxFee wei');
+      printV('Estimated deployment fee: $estimatedFee wei');
+      printV('Max fee with buffer: $maxFee wei');
 
       if (balance < maxFee) {
         throw StarknetInsufficientBalanceException(
@@ -440,7 +441,7 @@ abstract class StarknetWalletBase
       }
 
       // Deploy account
-      print('Deploying account contract...');
+      printV('Deploying account contract...');
       final txHash = await starknetAccount.deploy(maxFee: maxFee);
 
       return {
@@ -512,13 +513,13 @@ abstract class StarknetWalletBase
           
           transactions[txInfo.id] = txInfo;
         } catch (e) {
-          print('Error parsing transaction: $e');
+          printV('Error parsing transaction: $e');
         }
       }
 
       return transactions;
     } catch (e) {
-      print('Error fetching transactions: $e');
+      printV('Error fetching transactions: $e');
       return {};
     }
   }
@@ -541,7 +542,7 @@ abstract class StarknetWalletBase
       transactionHistory.addMany(transactions);
       await transactionHistory.save();
     } catch (e) {
-      print('Error updating transaction history: $e');
+      printV('Error updating transaction history: $e');
     }
   }
 
@@ -564,7 +565,7 @@ abstract class StarknetWalletBase
       syncStatus = SyncedSyncStatus();
     } catch (e) {
       syncStatus = FailedSyncStatus();
-      print('Sync failed: $e');
+      printV('Sync failed: $e');
       if (e is StarknetException) rethrow;
       throw StarknetNetworkException(
         'Failed to synchronize wallet',
@@ -601,7 +602,7 @@ abstract class StarknetWalletBase
         encryptionFileUtils,
       );
     } catch (e) {
-      print('No .keys file found, checking legacy format: $e');
+      printV('No .keys file found, checking legacy format: $e');
     }
 
     // Load wallet data
@@ -610,7 +611,7 @@ abstract class StarknetWalletBase
       final jsonSource = await encryptionFileUtils.read(path: path, password: password);
       data = json.decode(jsonSource) as Map<String, dynamic>;
     } catch (e) {
-      print('Error loading wallet data: $e');
+      printV('Error loading wallet data: $e');
     }
 
     final balance = StarknetBalance.fromJSON(data?['balance'] as String?) ??
@@ -622,7 +623,7 @@ abstract class StarknetWalletBase
 
     // Migration: If keys in wallet data but not in .keys file, migrate them
     if (keysData == null && (mnemonic != null || privateKey != null)) {
-      print('Migrating wallet to .keys file format');
+      printV('Migrating wallet to .keys file format');
       try {
         await WalletKeysFile.createKeysFile(
           name,
@@ -635,14 +636,14 @@ abstract class StarknetWalletBase
           encryptionFileUtils,
         );
       } catch (e) {
-        print('Error creating .keys file during migration: $e');
+        printV('Error creating .keys file during migration: $e');
       }
     }
 
     // Calculate address if missing or placeholder
     if ((walletInfo.address == '0x0' || walletInfo.address.isEmpty) &&
         (mnemonic != null || privateKey != null)) {
-      print('Calculating account address');
+      printV('Calculating account address');
       try {
         final Felt privateKeyFelt;
         if (mnemonic != null) {
@@ -661,9 +662,9 @@ abstract class StarknetWalletBase
 
         walletInfo.address = account.calculateAccountAddress().toHexString();
         await walletInfo.save();
-        print('Address calculated and saved: ${walletInfo.address}');
+        printV('Address calculated and saved: ${walletInfo.address}');
       } catch (e) {
-        print('Error calculating address: $e');
+        printV('Error calculating address: $e');
       }
     }
 
@@ -695,11 +696,11 @@ abstract class StarknetWalletBase
           );
           balance[token] = StarknetBalance(balanceValue);
         } catch (e) {
-          print('Error fetching balance for ${token.symbol}: $e');
+          printV('Error fetching balance for ${token.symbol}: $e');
         }
       }
     } catch (e) {
-      print('Error updating balance: $e');
+      printV('Error updating balance: $e');
       if (e is StarknetException) rethrow;
       throw StarknetNetworkException(
         'Failed to fetch account balance',
@@ -716,7 +717,7 @@ abstract class StarknetWalletBase
     try {
       return await _client.checkNodeHealth();
     } catch (e) {
-      print('Error checking node health: $e');
+      printV('Error checking node health: $e');
       return false;
     }
   }
