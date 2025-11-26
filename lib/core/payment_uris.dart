@@ -253,6 +253,22 @@ class DogeURI extends PaymentURI {
   }
 }
 
+class StarknetURI extends PaymentURI {
+  StarknetURI({required String amount, required String address})
+      : super(amount: amount, address: address);
+
+  @override
+  String toString() {
+    var base = 'starknet:' + address;
+
+    if (amount.isNotEmpty) {
+      base += '?amount=${amount.replaceAll(',', '.')}';
+    }
+
+    return base;
+  }
+}
+
 class ERC681URI extends PaymentURI {
   final int chainId;
   final String? contractAddress;

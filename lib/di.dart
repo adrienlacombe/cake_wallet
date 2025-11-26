@@ -274,6 +274,7 @@ import 'package:cake_wallet/view_model/wallet_unlock_loadable_view_model.dart';
 import 'package:cake_wallet/view_model/wallet_unlock_verifiable_view_model.dart';
 import 'package:cake_wallet/wownero/wownero.dart';
 import 'package:cake_wallet/zano/zano.dart';
+import 'package:cw_starknet/starknet_wallet_service.dart';
 import 'package:cw_core/crypto_currency.dart';
 import 'package:cw_core/wallet_info.dart';
 import 'package:cw_core/wallet_type.dart';
@@ -1192,8 +1193,13 @@ Future<void> setup({
     walletLoadingService: getIt.get<WalletLoadingService>(),
   ));
 
+  getIt.registerFactory<StarknetWalletService>(
+      () => StarknetWalletService(SettingsStoreBase.walletPasswordDirectInput));
+
   getIt.registerFactoryParam<WalletService, WalletType, void>((WalletType param1, __) {
     switch (param1) {
+      case WalletType.starknet:
+        return getIt.get<StarknetWalletService>();
       case WalletType.monero:
         return monero!.createMoneroWalletService(_unspentCoinsInfoSource);
       case WalletType.bitcoin:

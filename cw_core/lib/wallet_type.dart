@@ -21,6 +21,7 @@ const walletTypes = [
   WalletType.dogecoin,
   WalletType.base,
   WalletType.arbitrum,
+  WalletType.starknet,
 ];
 
 @HiveType(typeId: WALLET_TYPE_TYPE_ID)
@@ -73,11 +74,14 @@ enum WalletType {
   @HiveField(15)
   dogecoin,
 
-  @HiveField(16)
+  @HiveField(17)
   base,
 
-  @HiveField(17)
+  @HiveField(18)
   arbitrum,
+
+  @HiveField(19)
+  starknet,
 }
 
 int serializeToInt(WalletType type) {
@@ -116,6 +120,8 @@ int serializeToInt(WalletType type) {
       return 15;
     case WalletType.arbitrum:
       return 16;
+    case WalletType.starknet:
+      return 17;
     case WalletType.none:
       return -1;
   }
@@ -157,6 +163,8 @@ WalletType deserializeFromInt(int raw) {
       return WalletType.base;
     case 16:
       return WalletType.arbitrum;
+    case 17:
+      return WalletType.starknet;
     default:
       throw Exception('Unexpected token: $raw for WalletType deserializeFromInt');
   }
@@ -198,6 +206,8 @@ String walletTypeToString(WalletType type) {
       return 'Base';
     case WalletType.arbitrum:
       return 'Arbitrum';
+    case WalletType.starknet:
+      return 'Starknet';
     case WalletType.none:
       return '';
   }
@@ -239,6 +249,8 @@ String walletTypeToDisplayName(WalletType type) {
       return 'Base (BASE)';
     case WalletType.arbitrum:
       return 'Arbitrum (ARB)';
+    case WalletType.starknet:
+      return 'Starknet (STRK)';
     case WalletType.none:
       return '';
   }
@@ -281,6 +293,8 @@ WalletType? cryptoCurrencyToWalletType(CryptoCurrency type) {
       return WalletType.base;
     case CryptoCurrency.arbEth:
       return WalletType.arbitrum;
+    case CryptoCurrency.strk:
+      return WalletType.starknet;
     default:
       return null;
   }

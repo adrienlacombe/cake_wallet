@@ -25,6 +25,7 @@ import 'package:cw_core/wallet_base.dart';
 import 'package:cw_core/wallet_credentials.dart';
 import 'package:cw_core/wallet_info.dart';
 import 'package:cw_core/wallet_type.dart';
+import 'package:cw_starknet/starknet_wallet_creation_credentials.dart';
 import 'package:mobx/mobx.dart';
 
 part 'wallet_restore_view_model.g.dart';
@@ -57,6 +58,7 @@ abstract class WalletRestoreViewModelBase extends WalletCreationVM with Store {
       case WalletType.decred:
       case WalletType.bitcoin:
       case WalletType.litecoin:
+      case WalletType.starknet:
         availableModes = [WalletRestoreMode.seed, WalletRestoreMode.keys];
         break;
       case WalletType.bitcoinCash:
@@ -98,7 +100,9 @@ abstract class WalletRestoreViewModelBase extends WalletCreationVM with Store {
     WalletType.nano,
     WalletType.banano,
     WalletType.solana,
-    WalletType.tron
+    WalletType.solana,
+    WalletType.tron,
+    WalletType.starknet
   ].contains(type);
 
   late final bool onlyViewKeyRestore = [
@@ -229,6 +233,13 @@ abstract class WalletRestoreViewModelBase extends WalletCreationVM with Store {
               mnemonic: seed,
               password: password,
           );
+        case WalletType.starknet:
+          return StarknetRestoreWalletFromSeedCredentials(
+            name: name,
+            password: password,
+            mnemonic: seed,
+            passphrase: passphrase,
+          );
         case WalletType.none:
         case WalletType.haven:
           break;
@@ -330,6 +341,12 @@ abstract class WalletRestoreViewModelBase extends WalletCreationVM with Store {
             name: name,
             password: password,
             pubkey: viewKey!,
+          );
+        case WalletType.starknet:
+          return StarknetRestoreWalletFromPrivateKey(
+            name: name,
+            password: password,
+            privateKey: options['private_key'] as String,
           );
         default:
           break;

@@ -8,6 +8,7 @@ import 'package:cake_wallet/bitcoin_cash/bitcoin_cash.dart';
 import 'package:cake_wallet/solana/solana.dart';
 import 'package:cake_wallet/tron/tron.dart';
 import 'package:cake_wallet/wownero/wownero.dart';
+import 'package:cw_starknet/starknet_wallet_creation_credentials.dart';
 import 'package:hive/hive.dart';
 import 'package:mobx/mobx.dart';
 import 'package:cake_wallet/bitcoin/bitcoin.dart';
@@ -143,6 +144,13 @@ abstract class WalletNewVMBase extends WalletCreationVM with Store {
         );
       case WalletType.tron:
         return tron!.createTronNewWalletCredentials(
+          name: name,
+          password: walletPassword,
+          mnemonic: newWalletArguments!.mnemonic,
+          passphrase: passphrase,
+        );
+      case WalletType.starknet:
+        return StarknetNewWalletCredentials(
           name: name,
           password: walletPassword,
           mnemonic: newWalletArguments!.mnemonic,

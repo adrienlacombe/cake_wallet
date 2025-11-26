@@ -152,6 +152,12 @@ dependencies:
       ref: b48a9defddce036048bae02e2069ebcbd6824afc
   torch_dart:
     path: ./scripts/torch_dart
+  starknet:
+    git:
+      url: https://github.com/focustree/starknet.dart.git
+  cw_starknet:
+    path: cw_starknet
+
 
 dev_dependencies:
   flutter_test:

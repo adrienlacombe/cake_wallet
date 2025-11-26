@@ -149,6 +149,8 @@ abstract class WalletAddressListViewModelBase extends WalletChangeListenerViewMo
         return BaseURI(amount: amount, address: address.address);
       case WalletType.arbitrum:
         return ArbitrumURI(amount: amount, address: address.address);
+      case WalletType.starknet:
+        return StarknetURI(amount: amount, address: address.address);
       case WalletType.none:
         throw Exception('Unexpected type: ${type.toString()}');
     }
@@ -279,6 +281,14 @@ abstract class WalletAddressListViewModelBase extends WalletChangeListenerViewMo
       final primaryAddress = arbitrum!.getAddress(wallet);
 
       addressList.add(WalletAddressListItem(isPrimary: true, name: null, address: primaryAddress));
+    }
+
+    if (wallet.type == WalletType.starknet) {
+      addressList.add(WalletAddressListItem(
+        isPrimary: true,
+        name: null,
+        address: wallet.walletAddresses.address,
+      ));
     }
 
     if (wallet.type == WalletType.solana) {
@@ -463,6 +473,13 @@ abstract class WalletAddressListViewModelBase extends WalletChangeListenerViewMo
         return [
           'assets/images/crypto/arbitrum.webp',
           'assets/images/usdc_icon.svg',
+          'assets/images/more_tokens.svg',
+        ];
+      case WalletType.starknet:
+        return [
+          'assets/images/crypto/starknet.png',
+          'assets/images/usdc_icon.svg',
+          'assets/images/usdt_wallet_icon.svg',
           'assets/images/more_tokens.svg',
         ];
       default:

@@ -130,6 +130,7 @@ abstract class WalletKeysViewModelBase with Store {
       case WalletType.arbitrum:
       case WalletType.solana:
       case WalletType.tron:
+      case WalletType.starknet:
         items.addAll([
           if (_wallet.privateKey != null)
             StandartListItem(
@@ -262,6 +263,8 @@ abstract class WalletKeysViewModelBase with Store {
         return 'solana-wallet';
       case WalletType.tron:
         return 'tron-wallet';
+      case WalletType.starknet:
+        return 'starknet-wallet';
       case WalletType.wownero:
         return 'wownero-wallet';
       case WalletType.zano:
