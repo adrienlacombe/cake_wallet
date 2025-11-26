@@ -12,7 +12,7 @@ defaults:
     shell: bash
 jobs:
   Automated_integration_test:
-    runs-on: ubuntu-latest-4-cores
+    runs-on: ubuntu-latest
     timeout-minutes: 90
     container:
       image: ghcr.io/cake-tech/cake_wallet:debian12-flutter3.27.0-go1.24.1-ruststablenightly
@@ -184,6 +184,14 @@ jobs:
           echo "const kryptonimApiKey = '${{ secrets.KRYPTONIM_API_KEY }}';" >> lib/.secrets.g.dart
           echo "const walletGroupSalt = '${{ secrets.WALLET_GROUP_SALT }}';" >> lib/.secrets.g.dart
           echo "const swapsXyzApiKey = '${{ secrets.SWAPSXYZ_API_KEY }}';" >> lib/.secrets.g.dart
+
+      - name: Install Android system images for emulator tests
+        run: |
+          # Install system images on-demand since they're not in the optimized container image
+          yes | sdkmanager \
+            "system-images;android-29;default;x86_64" \
+            "system-images;android-31;default;x86_64" || true
+          df -h
 
       - name: prepare monero_c and cache
         run: |

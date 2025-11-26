@@ -149,14 +149,18 @@ RUN ARCH=$(uname -m) && \
     && yes | sdkmanager "ndk;$ANDROID_NDK_VERSION"
 
 # Install dependencies for tests
+# NOTE: System images are commented out to reduce image size
+# They can be installed on-demand in workflows that need them (e.g., integration tests)
+# This saves several GB of disk space
 # Comes from https://github.com/ReactiveCircus/android-emulator-runner
 RUN ARCH=$(uname -m) && \
     if [ "$ARCH" != "x86_64" ]; then exit 0; fi \
     && yes | sdkmanager \
-    "system-images;android-29;default;x86_64" \
-    "system-images;android-31;default;x86_64" \
     "platforms;android-29" \
     "platforms;android-31"
+    # System images removed to reduce image size - install on-demand if needed:
+    # "system-images;android-29;default;x86_64" \
+    # "system-images;android-31;default;x86_64"
 
 # Fake the KVM status so the Android emulator doesn't complain (that much)
 RUN (addgroup kvm || true) && \
