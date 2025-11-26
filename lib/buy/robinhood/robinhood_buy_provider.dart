@@ -31,9 +31,11 @@ class RobinhoodBuyProvider extends BuyProvider {
           isTestEnvironment: isTestEnvironment,
           hardwareWalletVM: hardwareWalletVM,
           supportedCryptoList: supportedCryptoToFiatPairs(
-              notSupportedCrypto: _notSupportedCrypto, notSupportedFiat: _notSupportedFiat),
+              notSupportedCrypto: _notSupportedCrypto,
+              notSupportedFiat: _notSupportedFiat),
           supportedFiatList: supportedFiatToCryptoPairs(
-              notSupportedFiat: _notSupportedFiat, notSupportedCrypto: _notSupportedCrypto),
+              notSupportedFiat: _notSupportedFiat,
+              notSupportedCrypto: _notSupportedCrypto),
         );
 
   static const _baseUrl = 'applink.robinhood.com';
@@ -69,11 +71,12 @@ class RobinhoodBuyProvider extends BuyProvider {
   String get _apiSecret => secrets.exchangeHelperApiKey;
 
   Future<List<CryptoCurrency>> getSupportedAssets() async {
-    final uri = Uri.https(_apiBaseUrl, '$_assetsPath', {'applicationId': _applicationId});
+    final uri = Uri.https(
+        _apiBaseUrl, '$_assetsPath', {'applicationId': _applicationId});
 
     try {
-      final response =
-          await ProxyWrapper().get(clearnetUri: uri, headers: {'accept': 'application/json'});
+      final response = await ProxyWrapper()
+          .get(clearnetUri: uri, headers: {'accept': 'application/json'});
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body) as Map<String, dynamic>;
@@ -110,11 +113,13 @@ class RobinhoodBuyProvider extends BuyProvider {
       case WalletType.solana:
       case WalletType.tron:
       case WalletType.dogecoin:
+      case WalletType.starknet:
         return wallet.signMessage(message);
       case WalletType.litecoin:
       case WalletType.bitcoin:
       case WalletType.bitcoinCash:
-        return wallet.signMessage(message, address: wallet.walletAddresses.address);
+        return wallet.signMessage(message,
+            address: wallet.walletAddresses.address);
       case WalletType.monero:
       case WalletType.none:
       case WalletType.haven:
@@ -123,13 +128,15 @@ class RobinhoodBuyProvider extends BuyProvider {
       case WalletType.wownero:
       case WalletType.zano:
       case WalletType.decred:
-        throw Exception("Wallet Type ${wallet.type.name} is not available for Robinhood");
+        throw Exception(
+            "Wallet Type ${wallet.type.name} is not available for Robinhood");
     }
   }
 
   Future<String> getConnectId() async {
     final walletAddress = wallet.walletAddresses.address;
-    final valid_until = (DateTime.now().millisecondsSinceEpoch / 1000).round() + 10;
+    final valid_until =
+        (DateTime.now().millisecondsSinceEpoch / 1000).round() + 10;
     final message = "$_apiSecret:${valid_until}";
 
     final signature = await getSignature(message);
@@ -139,20 +146,26 @@ class RobinhoodBuyProvider extends BuyProvider {
     final response = await ProxyWrapper().post(
       clearnetUri: uri,
       headers: {'Content-Type': 'application/json'},
-      body: json
-          .encode({'valid_until': valid_until, 'wallet': walletAddress, 'signature': signature}),
+      body: json.encode({
+        'valid_until': valid_until,
+        'wallet': walletAddress,
+        'signature': signature
+      }),
     );
 
     if (response.statusCode == 200) {
-      return (jsonDecode(response.body) as Map<String, dynamic>)['connectId'] as String;
+      return (jsonDecode(response.body) as Map<String, dynamic>)['connectId']
+          as String;
     } else {
-      throw Exception('Provider currently unavailable. Status: ${response.statusCode}');
+      throw Exception(
+          'Provider currently unavailable. Status: ${response.statusCode}');
     }
   }
 
   Future<Uri> requestProviderUrl() async {
     final connectId = await getConnectId();
-    final networkName = wallet.currency.fullName?.toUpperCase().replaceAll(" ", "_");
+    final networkName =
+        wallet.currency.fullName?.toUpperCase().replaceAll(" ", "_");
 
     return Uri.https(_baseUrl, '/u/connect', <String, dynamic>{
       'applicationId': _applicationId,
@@ -213,7 +226,8 @@ class RobinhoodBuyProvider extends BuyProvider {
     String? paymentMethod;
 
     if (_supportedCrypto.isEmpty) _supportedCrypto = await getSupportedAssets();
-    if (_supportedCrypto.isNotEmpty && !(_supportedCrypto.contains(cryptoCurrency))) return null;
+    if (_supportedCrypto.isNotEmpty &&
+        !(_supportedCrypto.contains(cryptoCurrency))) return null;
 
     if (paymentType != null && paymentType != PaymentType.all) {
       paymentMethod = normalizePaymentMethod(paymentType);
@@ -231,17 +245,20 @@ class RobinhoodBuyProvider extends BuyProvider {
       if (paymentMethod != null) 'paymentMethod': paymentMethod,
     };
 
-    final uri =
-        Uri.https('api.robinhood.com', '/catpay/v1/${cryptoCurrency.title}/quote/', queryParams);
+    final uri = Uri.https('api.robinhood.com',
+        '/catpay/v1/${cryptoCurrency.title}/quote/', queryParams);
 
     try {
-      final response = await ProxyWrapper().get(clearnetUri: uri, headers: {'accept': 'application/json'});
-      
+      final response = await ProxyWrapper()
+          .get(clearnetUri: uri, headers: {'accept': 'application/json'});
+
       final responseData = jsonDecode(response.body) as Map<String, dynamic>;
 
       if (response.statusCode == 200) {
-        final paymentType = _getPaymentTypeByString(responseData['paymentMethod'] as String?);
-        final quote = Quote.fromRobinhoodJson(responseData, isBuyAction, paymentType);
+        final paymentType =
+            _getPaymentTypeByString(responseData['paymentMethod'] as String?);
+        final quote =
+            Quote.fromRobinhoodJson(responseData, isBuyAction, paymentType);
         quote.setFiatCurrency = fiatCurrency;
         quote.setCryptoCurrency = cryptoCurrency;
         return [quote];
@@ -249,7 +266,8 @@ class RobinhoodBuyProvider extends BuyProvider {
         if (responseData.containsKey('message')) {
           log('Robinhood Error: ${responseData['message']}');
         } else {
-          printV('Robinhood Failed to fetch $action quote: ${response.statusCode}');
+          printV(
+              'Robinhood Failed to fetch $action quote: ${response.statusCode}');
         }
         return null;
       }

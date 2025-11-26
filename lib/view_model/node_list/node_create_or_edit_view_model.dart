@@ -13,10 +13,12 @@ import 'package:permission_handler/permission_handler.dart';
 
 part 'node_create_or_edit_view_model.g.dart';
 
-class NodeCreateOrEditViewModel = NodeCreateOrEditViewModelBase with _$NodeCreateOrEditViewModel;
+class NodeCreateOrEditViewModel = NodeCreateOrEditViewModelBase
+    with _$NodeCreateOrEditViewModel;
 
 abstract class NodeCreateOrEditViewModelBase with Store {
-  NodeCreateOrEditViewModelBase(this._nodeSource, this._walletType, this._settingsStore)
+  NodeCreateOrEditViewModelBase(
+      this._nodeSource, this._walletType, this._settingsStore)
       : state = InitialExecutionState(),
         connectionState = InitialExecutionState(),
         useSSL = false,
@@ -71,10 +73,13 @@ abstract class NodeCreateOrEditViewModelBase with Store {
 
   @computed
   bool get isReady =>
-      (address.isNotEmpty) || _walletType == WalletType.decred; // Allow an empty address.
+      (address.isNotEmpty) ||
+      _walletType == WalletType.decred; // Allow an empty address.
 
   bool get hasAuthCredentials =>
-      _walletType == WalletType.monero || _walletType == WalletType.wownero || _walletType == WalletType.haven;
+      _walletType == WalletType.monero ||
+      _walletType == WalletType.wownero ||
+      _walletType == WalletType.haven;
 
   bool get hasPathSupport {
     switch (_walletType) {
@@ -86,6 +91,7 @@ abstract class NodeCreateOrEditViewModelBase with Store {
       case WalletType.banano:
       case WalletType.nano:
       case WalletType.tron:
+      case WalletType.starknet:
         return true;
       case WalletType.none:
       case WalletType.monero:
@@ -151,7 +157,8 @@ abstract class NodeCreateOrEditViewModelBase with Store {
   void setTrusted(bool val) => trusted = val;
 
   @action
-  void setIsEnabledForAutoSwitching(bool val) => isEnabledForAutoSwitching = val;
+  void setIsEnabledForAutoSwitching(bool val) =>
+      isEnabledForAutoSwitching = val;
 
   @action
   void setSocksProxy(bool val) => useSocksProxy = val;
@@ -238,7 +245,8 @@ abstract class NodeCreateOrEditViewModelBase with Store {
         throw Exception('Unexpected scan QR code value: value is empty');
       }
 
-      if (code.startsWith("monero_node:")) code = code.replaceFirst("monero_node:", "tcp://");
+      if (code.startsWith("monero_node:"))
+        code = code.replaceFirst("monero_node:", "tcp://");
       if (!code.contains('://')) code = 'tcp://$code';
 
       final uri = Uri.tryParse(code);

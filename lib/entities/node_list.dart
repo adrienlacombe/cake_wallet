@@ -55,6 +55,8 @@ Future<List<Node>> loadDefaultNodes(WalletType type) async {
     case WalletType.arbitrum:
       path = 'assets/arbitrum_node_list.yml';
       break;
+    case WalletType.starknet:
+      return [];
     case WalletType.banano:
     case WalletType.none:
       path = '';
@@ -77,7 +79,8 @@ Future<List<Node>> loadDefaultNodes(WalletType type) async {
 }
 
 Future<List<Node>> loadDefaultNanoPowNodes() async {
-  final powNodesRaw = await rootBundle.loadString('assets/nano_pow_node_list.yml');
+  final powNodesRaw =
+      await rootBundle.loadString('assets/nano_pow_node_list.yml');
   final loadedPowNodes = loadYaml(powNodesRaw) as YamlList;
   final nodes = <Node>[];
 
@@ -95,8 +98,10 @@ Future<List<Node>> loadDefaultNanoPowNodes() async {
 Future<void> resetToDefault(Box<Node> nodeSource) async {
   final moneroNodes = await loadDefaultNodes(WalletType.monero);
   final bitcoinElectrumServerList = await loadDefaultNodes(WalletType.bitcoin);
-  final litecoinElectrumServerList = await loadDefaultNodes(WalletType.litecoin);
-  final bitcoinCashElectrumServerList = await loadDefaultNodes(WalletType.bitcoinCash);
+  final litecoinElectrumServerList =
+      await loadDefaultNodes(WalletType.litecoin);
+  final bitcoinCashElectrumServerList =
+      await loadDefaultNodes(WalletType.bitcoinCash);
   final havenNodes = await loadDefaultNodes(WalletType.haven);
   final ethereumNodes = await loadDefaultNodes(WalletType.ethereum);
   final nanoNodes = await loadDefaultNodes(WalletType.nano);
@@ -105,7 +110,8 @@ Future<void> resetToDefault(Box<Node> nodeSource) async {
   final tronNodes = await loadDefaultNodes(WalletType.tron);
   final decredNodes = await loadDefaultNodes(WalletType.decred);
   final zanoNodes = await loadDefaultNodes(WalletType.zano);
-  final dogecoinElectrumServerList = await loadDefaultNodes(WalletType.dogecoin);
+  final dogecoinElectrumServerList =
+      await loadDefaultNodes(WalletType.dogecoin);
   final baseNodes = await loadDefaultNodes(WalletType.base);
   final arbitrumNodes = await loadDefaultNodes(WalletType.arbitrum);
 

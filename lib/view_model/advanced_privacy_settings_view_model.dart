@@ -12,7 +12,8 @@ class AdvancedPrivacySettingsViewModel = AdvancedPrivacySettingsViewModelBase
     with _$AdvancedPrivacySettingsViewModel;
 
 abstract class AdvancedPrivacySettingsViewModelBase with Store {
-  AdvancedPrivacySettingsViewModelBase(this.type, this._settingsStore) : _addCustomNode = false;
+  AdvancedPrivacySettingsViewModelBase(this.type, this._settingsStore)
+      : _addCustomNode = false;
 
   @computed
   ExchangeApiMode get exchangeStatus => _settingsStore.exchangeStatus;
@@ -43,6 +44,7 @@ abstract class AdvancedPrivacySettingsViewModelBase with Store {
       case WalletType.arbitrum:
       case WalletType.solana:
       case WalletType.tron:
+      case WalletType.starknet:
         return true;
 
       case WalletType.bitcoin:
@@ -89,6 +91,7 @@ abstract class AdvancedPrivacySettingsViewModelBase with Store {
         WalletType.wownero,
         WalletType.zano,
         WalletType.dogecoin,
+        WalletType.starknet,
       ].contains(type);
 
   @computed
@@ -98,13 +101,16 @@ abstract class AdvancedPrivacySettingsViewModelBase with Store {
   SeedPhraseLength get seedPhraseLength => _settingsStore.seedPhraseLength;
 
   @computed
-  bool get isPolySeed => _settingsStore.moneroSeedType == MoneroSeedType.polyseed;
+  bool get isPolySeed =>
+      _settingsStore.moneroSeedType == MoneroSeedType.polyseed;
 
   @action
-  void setFiatApiMode(FiatApiMode fiatApiMode) => _settingsStore.fiatApiMode = fiatApiMode;
+  void setFiatApiMode(FiatApiMode fiatApiMode) =>
+      _settingsStore.fiatApiMode = fiatApiMode;
 
   @action
-  void setExchangeApiMode(ExchangeApiMode value) => _settingsStore.exchangeStatus = value;
+  void setExchangeApiMode(ExchangeApiMode value) =>
+      _settingsStore.exchangeStatus = value;
 
   @action
   void setDisableBulletin(bool value) => _settingsStore.disableBulletin = value;
@@ -113,5 +119,6 @@ abstract class AdvancedPrivacySettingsViewModelBase with Store {
   void toggleAddCustomNode() => _addCustomNode = !_addCustomNode;
 
   @action
-  void setSeedPhraseLength(SeedPhraseLength length) => _settingsStore.seedPhraseLength = length;
+  void setSeedPhraseLength(SeedPhraseLength length) =>
+      _settingsStore.seedPhraseLength = length;
 }

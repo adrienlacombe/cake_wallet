@@ -35,6 +35,7 @@ String getQrImage(WalletType type) {
     case WalletType.banano:
     case WalletType.haven:
     case WalletType.none:
+    case WalletType.starknet:
       return 'assets/images/qr-cake.png';
   }
 }
