@@ -8,27 +8,22 @@ defaults:
 jobs:
   PR_test_build:
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/cake-tech/cake_wallet:debian13-flutter3.32.0-ndkr28-go1.24.1-ruststablenightly
-      env:
-        STORE_PASS: test@cake_wallet
-        KEY_PASS: test@cake_wallet
-        MONEROC_CACHE_DIR_ROOT: /opt/generic_cache
-        BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
-        ANDROID_AVD_HOME: /root/.android/avd
     strategy:
       matrix:
         api-level: [29]
 
     steps:
-      - name: Fix github actions messing up $HOME...
-        run: 'echo HOME=/root | sudo tee -a $GITHUB_ENV'
-      - name: Clean up Android system images to free disk space
+      - name: Clean up Docker to free disk space
         run: |
-          # Remove Android system images (not needed for builds, only for emulator tests)
-          # This frees up several GB of disk space
-          rm -rf ${ANDROID_HOME}/system-images/* || true
+          # Aggressively clean up Docker to free maximum space before pulling large image
+          sudo docker system prune -af --volumes || true
+          sudo docker image prune -af || true
+          # Remove all stopped containers
+          sudo docker container prune -af || true
+          # Remove build cache
+          sudo docker builder prune -af || true
           df -h
+      
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha }}

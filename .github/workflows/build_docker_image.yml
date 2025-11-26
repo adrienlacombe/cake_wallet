@@ -9,6 +9,9 @@ on:
       - main
       - starknet
   workflow_dispatch:  # Allow manual triggering
+  schedule:
+    # Run daily at 2 AM UTC as a backup (in case push trigger fails)
+    - cron: '0 2 * * *'
 
 env:
   IMAGE_NAME: ghcr.io/cake-tech/cake_wallet
