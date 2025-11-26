@@ -12,7 +12,7 @@ defaults:
     shell: bash
 jobs:
   Automated_integration_test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-4-cores
     timeout-minutes: 90
     container:
       image: ghcr.io/cake-tech/cake_wallet:debian12-flutter3.27.0-go1.24.1-ruststablenightly
