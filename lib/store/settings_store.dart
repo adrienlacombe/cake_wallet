@@ -1297,6 +1297,7 @@ abstract class SettingsStoreBase with Store {
     final zcashNodeId = sharedPreferences.getInt(PreferencesKey.currentZcashNodeIdKey);
     final decredNodeId = sharedPreferences.getInt(PreferencesKey.currentDecredNodeIdKey);
     final dogecoinNodeId = sharedPreferences.getInt(PreferencesKey.currentDogecoinNodeIdKey);
+    final starknetNodeId = sharedPreferences.getInt(PreferencesKey.currentStarknetNodeIdKey);
 
     /// get the selected node, if null, then use the default
     final moneroNode = nodeSource.get(nodeId) ??
@@ -1335,6 +1336,8 @@ abstract class SettingsStoreBase with Store {
         nodeSource.values.firstWhereOrNull((e) => e.uriRaw == zcashDefaultNodeUri);
     final dogecoinNode = nodeSource.get(dogecoinNodeId) ??
         nodeSource.values.firstWhereOrNull((e) => e.uriRaw == dogecoinDefaultNodeUri);
+    final starknetNode = nodeSource.get(starknetNodeId) ??
+        nodeSource.values.firstWhereOrNull((e) => e.uriRaw == starknetDefaultNodeUri);
 
     final packageInfo = await PackageInfo.fromPlatform();
     final deviceName = await _getDeviceName() ?? '';
@@ -1441,6 +1444,10 @@ abstract class SettingsStoreBase with Store {
 
     if (dogecoinNode != null) {
       nodes[WalletType.dogecoin] = dogecoinNode;
+    }
+
+    if (starknetNode != null) {
+      nodes[WalletType.starknet] = starknetNode;
     }
 
     final savedSyncMode = SyncMode.all.firstWhere((element) {
@@ -1869,6 +1876,7 @@ abstract class SettingsStoreBase with Store {
     final zcashNodeId = sharedPreferences.getInt(PreferencesKey.currentZcashNodeIdKey);
     final decredNodeId = sharedPreferences.getInt(PreferencesKey.currentDecredNodeIdKey);
     final dogecoinNodeId = sharedPreferences.getInt(PreferencesKey.currentDogecoinNodeIdKey);
+    final starknetNodeId = sharedPreferences.getInt(PreferencesKey.currentStarknetNodeIdKey);
     final moneroNode = nodeSource.get(nodeId);
     final bitcoinElectrumServer = nodeSource.get(bitcoinElectrumServerId);
     final litecoinElectrumServer = nodeSource.get(litecoinElectrumServerId);
@@ -1887,6 +1895,7 @@ abstract class SettingsStoreBase with Store {
     final zcashNode = nodeSource.get(zcashNodeId);
     final decredNode = nodeSource.get(decredNodeId);
     final dogecoinNode = nodeSource.get(dogecoinNodeId);
+    final starknetNode = nodeSource.get(starknetNodeId);
 
     if (moneroNode != null) {
       nodes[WalletType.monero] = moneroNode;
@@ -1958,6 +1967,10 @@ abstract class SettingsStoreBase with Store {
 
     if (dogecoinNode != null) {
       nodes[WalletType.dogecoin] = dogecoinNode;
+    }
+
+    if (starknetNode != null) {
+      nodes[WalletType.starknet] = starknetNode;
     }
 
     // MIGRATED:
@@ -2111,6 +2124,9 @@ abstract class SettingsStoreBase with Store {
         break;
       case WalletType.zcash:
         await _sharedPreferences.setInt(PreferencesKey.currentZcashNodeIdKey, node.key as int);
+        break;
+      case WalletType.starknet:
+        await _sharedPreferences.setInt(PreferencesKey.currentStarknetNodeIdKey, node.key as int);
         break;
       case WalletType.none:
         throw UnimplementedError();
