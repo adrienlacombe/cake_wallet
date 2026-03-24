@@ -1,7 +1,7 @@
 PODS:
   - bitbox_flutter (0.0.1):
     - Flutter
-  - breez_sdk_spark_flutter (0.9.1):
+  - breez_sdk_spark_flutter (0.11.0):
     - Flutter
   - connectivity_plus (0.0.1):
     - Flutter
@@ -303,7 +303,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   bitbox_flutter: 9505732798041c413152669751beeaecc5fe400f
-  breez_sdk_spark_flutter: 06b83cd2183cee0902f552496ddf02fe4c011058
+  breez_sdk_spark_flutter: 5bf9ff7455198c770b908c5d2ee52283474225f1
   connectivity_plus: cb623214f4e1f6ef8fe7403d580fdad517d2f7dd
   CryptoSwift: e64e11850ede528a02a0f3e768cec8e9d92ecb90
   cw_decred: a02cf30175a46971c1e2fa22c48407534541edc6

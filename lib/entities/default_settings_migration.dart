@@ -622,13 +622,25 @@ Future<void> defaultSettingsMigration(
           await sharedPreferences.setBool(PreferencesKey.forceDecentralizedExchanges, false);
           break;
         case 62:
+          await _changeExchangeProviderAvailability(
+            sharedPreferences,
+            providerName: "Swaps.XYZ",
+            enabled: false,
+          );
+          await _changeExchangeProviderAvailability(
+            sharedPreferences,
+            providerName: "StealthEX",
+            enabled: false,
+          );
+          break;
+        case 63:
           await addWalletNodeList(nodes: nodes, type: WalletType.starknet);
           await _repairStarknetNodes(
             nodes: nodes,
             sharedPreferences: sharedPreferences,
           );
           break;
-        case 63:
+        case 64:
           await addWalletNodeList(nodes: nodes, type: WalletType.starknet);
           break;
         default:
@@ -786,15 +798,15 @@ String _getDefaultNodeUri(WalletType type) {
   }
 }
 
-void _changeExchangeProviderAvailability(SharedPreferences sharedPreferences,
-    {required String providerName, required bool enabled}) {
-  final Map<String, dynamic> exchangeProvidersSelection = json.decode(
-      sharedPreferences.getString(PreferencesKey.exchangeProvidersSelection) ??
-          "{}") as Map<String, dynamic>;
+Future<void> _changeExchangeProviderAvailability(SharedPreferences sharedPreferences,
+    {required String providerName, required bool enabled}) async {
+  final Map<String, dynamic> exchangeProvidersSelection =
+      json.decode(sharedPreferences.getString(PreferencesKey.exchangeProvidersSelection) ?? "{}")
+          as Map<String, dynamic>;
 
   exchangeProvidersSelection[providerName] = enabled;
 
-  sharedPreferences.setString(
+  await sharedPreferences.setString(
     PreferencesKey.exchangeProvidersSelection,
     json.encode(exchangeProvidersSelection),
   );

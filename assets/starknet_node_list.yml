@@ -7,11 +7,3 @@
   uri: starknet.api.onfinality.io/public
   useSSL: true
   isEnabledForAutoSwitching: true
--
-  uri: starknet-mainnet.public.blastapi.io/rpc/v0_7
-  useSSL: true
-  isEnabledForAutoSwitching: false
--
-  uri: free-rpc.nethermind.io/mainnet-juno/v0_7
-  useSSL: true
-  isEnabledForAutoSwitching: false
