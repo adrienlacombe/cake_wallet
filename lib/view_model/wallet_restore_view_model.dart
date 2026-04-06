@@ -260,6 +260,7 @@ abstract class WalletRestoreViewModelBase extends WalletCreationVM with Store {
             xpub: viewKey!,
             scanSecret: scanSecret!,
             spendPubkey: spendPubkey!,
+            hardwareWalletType: hardwareWalletType,
           );
 
         case WalletType.monero:
@@ -271,6 +272,7 @@ abstract class WalletRestoreViewModelBase extends WalletCreationVM with Store {
             address: address!,
             password: password,
             language: 'English',
+            hardwareWalletType: hardwareWalletType
           );
 
         case WalletType.nano:
