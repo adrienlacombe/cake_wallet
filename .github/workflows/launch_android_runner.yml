@@ -3,7 +3,7 @@ name: Launch Android Runner
 on:
   push:
     branches:
-      - feat/starknet
+      - feat/starknet-backup
   workflow_dispatch:
 
 permissions:

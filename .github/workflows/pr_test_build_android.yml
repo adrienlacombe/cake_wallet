@@ -3,7 +3,7 @@ name: Cake Wallet Android
 on:
   push:
     branches:
-      - feat/starknet
+      - feat/starknet-backup
 
 permissions:
   contents: read
